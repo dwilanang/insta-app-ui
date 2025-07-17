@@ -4,6 +4,43 @@
     <h1 class="text-2xl font-bold text-gray-800">Feed</h1>
 
     <div v-for="post in posts" :key="post.id" class="bg-white rounded-lg shadow p-4">
+      <div class="flex justify-between items-center">
+        <div>
+          
+        </div>
+
+        <div
+          class="relative"
+          v-if="post.user_id === auth.user.id"
+          :ref="el => setMenuRef(el, post.id)"
+        >
+          <svg
+            @click.stop="toggleMenu(post.id)"
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5 text-gray-500 cursor-pointer hover:text-gray-700"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              d="M10 6a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0 3.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 6.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"
+            />
+          </svg>
+
+          <!-- Menu dropdown -->
+          <div
+            v-if="post.showMenu"
+            class="absolute right-0 mt-2 w-40 bg-white border rounded shadow z-50"
+          >
+            <button
+              @click="deletePost(post.id)"
+              class="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100"
+            >
+              Hapus Postingan
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="flex items-center gap-3 mb-2">
         <img :src="post.profile_image_url" class="w-10 h-10 rounded-full object-cover" />
         <div>
@@ -74,6 +111,9 @@ import { useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/id'
+import { useAuthStore } from '../store/auth'
+
+const auth = useAuthStore()
 
 import PostForm from '../components/PostForm.vue'
 
@@ -86,6 +126,7 @@ const posts = ref([])
 const currentPage = ref(1)
 const isLoading = ref(false)
 const hasMore = ref(true)
+const menuRefs = ref({})
 
 function onPosted(force = false) {
   fetchPosts(force)
@@ -108,6 +149,7 @@ const fetchPosts = async (force = false) => {
     const newPosts = res.data.items.map(post => ({
       ...post,
       showComments: false,
+      showMenu: false,
       comments: [],
       newComment: ''
     }))
@@ -202,13 +244,45 @@ const handleScroll = () => {
   }
 }
 
+const toggleMenu = (postId) => {
+  posts.value = posts.value.map(p =>
+    p.id === postId ? { ...p, showMenu: !p.showMenu } : { ...p, showMenu: false }
+  )
+}
+
+const deletePost = async (postId) => {
+  try {
+    await axios.delete(`/api/v1/posts/${postId}`)
+    posts.value = posts.value.filter(p => p.id !== postId)
+  } catch (error) {
+    console.error('Gagal hapus postingan:', error)
+  }
+}
+
+function setMenuRef(el, postId) {
+  if (el) {
+    menuRefs.value[postId] = el
+  }
+}
+
+function handleClickOutside(event) {
+  for (const post of posts.value) {
+    const menuEl = menuRefs.value[post.id]
+    if (menuEl && !menuEl.contains(event.target)) {
+      post.showMenu = false
+    }
+  }
+}
+
 onMounted(() => {
   fetchPosts()
   window.addEventListener('scroll', handleScroll)
+  window.addEventListener('click', handleClickOutside)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('click', handleClickOutside)
 })
 
 const formatDate = (dateString) => {
