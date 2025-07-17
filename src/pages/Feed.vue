@@ -75,11 +75,51 @@
         </div>
         
         <div v-if="post.showComments" class="mt-4 space-y-2">
-          <div v-if="post.comments?.length" v-for="comment in post.comments" :key="comment.id" class="text-sm text-gray-700 border-b pb-1">
-            <strong>{{ comment.user.name }}:</strong> {{ comment.body }}
+          <!-- List komentar -->
+          <div v-if="post.comments?.length" v-for="comment in post.comments" :key="comment.id"  class="text-sm text-gray-700 border-b pb-1">
+                <!-- Box komentar -->
+                <div class="flex justify-between items-center">
+                    <p class="text-sm"><strong>{{ comment.user.name }}:</strong> {{ comment.body }}</p>
+                    
+                    <div
+                      class="relative"
+                      v-if="comment.user_id === auth.user.id"
+                      :ref="el => setMenuRef(el, post.id)"
+                    >
+                         <!-- Titik 3 hanya jika user adalah pemilik komentar -->
+                          <svg
+                            @click.stop="comment.showMenu = !comment.showMenu"
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              d="M10 6a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0 3.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 6.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"
+                            />
+                          </svg>
+
+                          <!-- Menu dropdown hapus komentar -->
+                          <div
+                            v-if="comment.showMenu"
+                            class="absolute right-0 mt-2 w-40 bg-white border rounded shadow z-50"
+                          >
+                            <button
+                              @click="deleteComment(post.id, comment.id)"
+                              class="block w-full text-left px-3 py-2 text-red-600 hover:bg-red-100"
+                            >
+                              Hapus Komentar
+                            </button>
+                          </div>
+                          <!-- /Menu dropdown hapus komentar -->
+                    </div>
+                </div>
+                <!-- /List komentar -->
           </div>
+          <!-- /List komentar -->
           <div v-else class="text-sm text-gray-400">Belum ada komentar</div>
           
+          <!-- Form komentar -->
           <form @submit.prevent="submitComment(post.id)" class="space-y-2">
             <textarea
               v-model="post.newComment"
@@ -94,6 +134,8 @@
               </button>
             </div>
           </form>
+          <!-- /Form komentar -->
+
         </div>
       </div>
     </div>
@@ -127,6 +169,7 @@ const currentPage = ref(1)
 const isLoading = ref(false)
 const hasMore = ref(true)
 const menuRefs = ref({})
+const commentMenuRefs = ref({})
 
 function onPosted(force = false) {
   fetchPosts(force)
@@ -259,6 +302,18 @@ const deletePost = async (postId) => {
   }
 }
 
+async function deleteComment(postId, commentId) {
+  try {
+    await axios.delete(`/api/v1/comments/${commentId}`)
+    const post = posts.value.find(p => p.id === postId)
+    if (post) {
+      post.comments = post.comments.filter(c => c.id !== commentId)
+    }
+  } catch (err) {
+    console.error('Gagal hapus komentar', err)
+  }
+}
+
 function setMenuRef(el, postId) {
   if (el) {
     menuRefs.value[postId] = el
@@ -274,15 +329,35 @@ function handleClickOutside(event) {
   }
 }
 
+function setCommentMenuRef(el, commentId) {
+  if (el) {
+    commentMenuRefs.value[commentId] = el
+  }
+}
+
+function handleClickOutsideComment(event) {
+  for (const [commentId, el] of Object.entries(commentMenuRefs.value)) {
+    if (el && !el.contains(event.target)) {
+  
+      for (const post of posts.value) {
+        const comment = post.comments.find(c => c.id == commentId)
+        if (comment) comment.showMenu = false
+      }
+    }
+  }
+}
+
 onMounted(() => {
   fetchPosts()
   window.addEventListener('scroll', handleScroll)
   window.addEventListener('click', handleClickOutside)
+  window.addEventListener('click', handleClickOutsideComment)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('click', handleClickOutsideComment)
 })
 
 const formatDate = (dateString) => {
