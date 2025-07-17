@@ -76,7 +76,7 @@
         
         <div v-if="post.showComments" class="mt-4 space-y-2">
           <!-- List komentar -->
-          <div v-if="post.comments?.length" v-for="comment in post.comments" :key="comment.id"  class="text-sm text-gray-700 border-b pb-1">
+          <div v-if="post.comments?.length" v-for="comment in post.comments" :key="comment.id" class="text-sm text-gray-700 border-b pb-1">
                 <!-- Box komentar -->
                 <div class="flex justify-between items-center">
                     <p class="text-sm"><strong>{{ comment.user.name }}:</strong> {{ comment.body }}</p>
@@ -84,7 +84,7 @@
                     <div
                       class="relative"
                       v-if="comment.user_id === auth.user.id"
-                      :ref="el => setMenuRef(el, post.id)"
+                      :ref="el => setCommentMenuRef(el, comment.id)"
                     >
                          <!-- Titik 3 hanya jika user adalah pemilik komentar -->
                           <svg
