@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-xl mx-auto py-8 space-y-6">
-    <PostForm @posted="fetchPosts" />
+    <PostForm @posted="onPosted" />
     <h1 class="text-2xl font-bold text-gray-800">Feed</h1>
 
     <div v-for="post in posts" :key="post.id" class="bg-white rounded-lg shadow p-4">
@@ -87,11 +87,20 @@ const currentPage = ref(1)
 const isLoading = ref(false)
 const hasMore = ref(true)
 
-const fetchPosts = async () => {
-  if (isLoading.value || !hasMore.value) return
+function onPosted(force = false) {
+  fetchPosts(force)
+}
+
+const fetchPosts = async (force = false) => {
+  if (!force && (isLoading.value || !hasMore.value)) return
 
   isLoading.value = true
   try {
+    if (force) {
+      currentPage.value = 1
+      hasMore.value = true
+    }
+
     const res = await axios.get('/api/v1/posts', {
       params: { page: currentPage.value, per_page: 4 }
     })
@@ -107,10 +116,14 @@ const fetchPosts = async () => {
       hasMore.value = false
     }
 
-    posts.value.push(...newPosts)
+    if (currentPage.value === 1) {
+      posts.value = [...newPosts]
+    } else {
+      posts.value.push(...newPosts)
+    }
+
     currentPage.value++
   } catch (err) {
-    console.error('Gagal fetch posts:', err)
     if (err.status == 401) {
       router.push('/login')
     }

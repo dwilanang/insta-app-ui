@@ -116,7 +116,7 @@ async function submitPost() {
     preview.value = null
     isFocused.value = false
 
-    emit('posted')
+    emit('posted', true)
   } catch (err) {
     console.error('Gagal posting:', err)
   } finally {
