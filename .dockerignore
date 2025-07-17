@@ -1,9 +1,5 @@
 node_modules
 .vite
 *.log
-src
-public
-*.json
 Dockerfile
 docker-compose.yml
-vite.config.*
