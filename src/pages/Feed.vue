@@ -138,7 +138,16 @@ const likePost = async (postId) => {
     await axios.post(`/api/v1/posts/${postId}/like`)
     console.log('Like berhasil')
    
-    fetchPosts()
+    const post = posts.value.find(p => p.id === postId)
+    if (post) {
+      if (post.is_liked) {
+        post.is_liked = false
+        post.likes_count = (post.likes_count || 1) - 1
+      } else {
+        post.is_liked = true
+        post.likes_count = (post.likes_count || 0) + 1
+      }
+    }
   } catch (error) {
     console.error('Gagal like:', error)
   }

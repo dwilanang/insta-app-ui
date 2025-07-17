@@ -65,5 +65,5 @@ windows : https://docs.docker.com/desktop/setup/install/windows-install/
 docker build -t insta-app-frontend .
 
 # 2. Jalankan container
-docker run -d -p 8000:80 insta-app-frontend
+docker run -d -p 8001:80 insta-app-frontend
 ```
