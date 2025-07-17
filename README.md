@@ -12,8 +12,6 @@ Ini adalah frontend dari aplikasi **Insta App**, sebuah platform media sosial se
 - 💬 **Komentar** – Komentari postingan pengguna lain.
 - ❤️ **Like** – Like dan unlike postingan.
 
----
-
 ## 🚀 Teknologi yang Digunakan
 
 - **Vue 3 Composition API**
@@ -23,11 +21,8 @@ Ini adalah frontend dari aplikasi **Insta App**, sebuah platform media sosial se
 - **Pinia**
 - **Docker** (opsional untuk deployment)
 
----
-
----
 ## 📂 Struktur Proyek
-
+```
 src/
 ├── assets/         # Aset gambar/logo
 ├── components/     # Komponen UI (PostForm, PostItem, CommentList, dsb)
@@ -36,8 +31,7 @@ src/
 ├── services/       # Axios instance dan API helper
 ├── store/          # (Opsional) Pinia store
 └── App.vue
-
----
+```
 
 ⚙️ Konfigurasi API
 Pastikan untuk mengatur URL API di file `src/main.js` sesuai dengan backend yang Anda gunakan.
@@ -58,9 +52,11 @@ npm install
 
 # 3. Jalankan development server
 npm run dev
+```
 
 ## 📦 Instalasi menggunakan Docker
 
+```bash
 # Install docker desktop
 macos : https://docs.docker.com/desktop/setup/install/mac-install/
 windows : https://docs.docker.com/desktop/setup/install/windows-install/
@@ -70,3 +66,4 @@ docker build -t insta-app-frontend .
 
 # 2. Jalankan container
 docker run -d -p 8000:80 insta-app-frontend
+```
