@@ -60,13 +60,17 @@
         </div>
       </div>
     </div>
+    <div v-if="isLoading" class="text-center py-6 text-gray-400 text-sm">
+      Memuat postingan...
+    </div>
   </div>
 </template>
 
 <script setup>
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/id'
@@ -76,17 +80,45 @@ import PostForm from '../components/PostForm.vue'
 dayjs.extend(relativeTime)
 dayjs.locale('id')
 
-const posts = ref([])
+const router = useRouter()
 
-async function fetchPosts() {
+const posts = ref([])
+const currentPage = ref(1)
+const isLoading = ref(false)
+const hasMore = ref(true)
+
+const fetchPosts = async () => {
+  if (isLoading.value || !hasMore.value) return
+
+  isLoading.value = true
   try {
-    const res = await axios.get('/api/v1/posts')
- 
-    posts.value = res.data.items
-  } catch (error) {
-    console.error('Gagal fetch feed:', error)
+    const res = await axios.get('/api/v1/posts', {
+      params: { page: currentPage.value, per_page: 4 }
+    })
+
+    const newPosts = res.data.items.map(post => ({
+      ...post,
+      showComments: false,
+      comments: [],
+      newComment: ''
+    }))
+
+    if (newPosts.length < 4) {
+      hasMore.value = false
+    }
+
+    posts.value.push(...newPosts)
+    currentPage.value++
+  } catch (err) {
+    console.error('Gagal fetch posts:', err)
+    if (err.status == 401) {
+      router.push('/login')
+    }
+  } finally {
+    isLoading.value = false
   }
 }
+
 
 const likePost = async (postId) => {
   try {
@@ -137,7 +169,25 @@ const submitComment = async (postId) => {
   }
 }
 
-onMounted(fetchPosts)
+const handleScroll = () => {
+  const scrollY = window.scrollY
+  const innerHeight = window.innerHeight
+  const offsetHeight = document.documentElement.offsetHeight
+
+  // Jika scroll sudah mendekati bawah (100px)
+  if (scrollY + innerHeight + 100 >= offsetHeight) {
+    fetchPosts()
+  }
+}
+
+onMounted(() => {
+  fetchPosts()
+  window.addEventListener('scroll', handleScroll)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 
 const formatDate = (dateString) => {
   const timeAgo = dayjs(dateString).fromNow()
