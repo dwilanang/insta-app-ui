@@ -1,13 +1,28 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import path from 'path'
+import rollupNodePolyFill from 'rollup-plugin-polyfill-node'
 
-// https://vite.dev/config/
+// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    {
+      ...rollupNodePolyFill(),
+      enforce: 'post'
+    },
+  ],
+  server: {
+    port: 8001,
+    host: true 
+  },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      crypto: 'crypto-browserify',
+      stream: 'stream-browserify',
+      buffer: 'buffer',
     },
+  },
+  optimizeDeps: {
+    include: ['crypto-browserify', 'stream-browserify', 'buffer'],
   },
 })
