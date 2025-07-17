@@ -100,7 +100,7 @@ const updateProfile = async () => {
         defaultAvatar = resp.data.data.photo_url
         message.value = resp.data.message
     } catch (error) {
-        console.error('Update failed:', error)
+        // console.error('Update failed:', error)
     }
 }
 </script>

@@ -1,57 +1,51 @@
 <template>
-  <div class="text-white flex justify-center items-center">
-    <div class="flex w-full max-w-5xl h-[600px]">
+  <div class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6 p-4 md:p-10">
       
-      <!-- Left: Gambar -->
-      <div class="hidden md:flex w-1/2 justify-center items-center">
-        <!-- <img src="/mock-image.png" alt="Preview" class="object-contain h-full" /> -->
+      <!-- Left Image Column -->
+      <div class="flex justify-center items-center">
+        <div class="text-center">
+          <img src="/insta-app.png" alt="InstaApp Logo" class="w-40 md:w-56 mx-auto mb-4" />
+          <!-- <h1 class="text-3xl md:text-5xl font-bold text-gray-800">Insta App</h1> -->
+        </div>
       </div>
 
-      <!-- Right: Form -->
-      <div class="w-full md:w-1/2 flex flex-col justify-center items-center px-4">
-        <div class="w-full max-w-sm space-y-4">
-            <h1 class="text-4xl font-logo text-center mb-6 text-black">InstaApp</h1>
+      <!-- Right Form Column -->
+      <div class="bg-white rounded-xl shadow-md p-8">
+        <form @submit.prevent="login">
+          <div class="space-y-4">
             <input
-                v-model="email"
-                type="text"
-                placeholder="Email"
-                class="w-full text-black border px-3 py-2 rounded focus:outline-none"
+              v-model="email"
+              type="email"
+              placeholder="Email"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              required
             />
-            <!-- <p v-if="errors.email" class="text-red-400 text-sm mt-1">
-                {{ errors.email[0] }}
-            </p> -->
             <input
-                v-model="password"
-                type="password"
-                placeholder="Password"
-                class="w-full text-black border px-3 py-2 rounded focus:outline-none"
+              v-model="password"
+              type="password"
+              placeholder="Password"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              required
             />
-            <!-- <p v-if="errors.password" class="text-red-400 text-sm mt-1">
-                {{ errors.password[0] }}
-            </p> -->
-
             <button
-                @click="login"
-                class="w-full bg-blue-500 text-white font-semibold py-2 rounded hover:bg-blue-600"
+              type="submit"
+              class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-semibold transition duration-200"
             >
-                Masuk
+              Masuk
             </button>
             <p v-if="errorMsg" class="text-red-400 text-sm text-center mt-2">
-                {{ errorMsg }}
+              {{ errorMsg }}
             </p>
+          </div>
+        </form>
 
-            <div class="flex items-center gap-2 justify-center text-sm text-zinc-400">
-                <span class="w-1/4 h-px bg-zinc-700"></span>
-            </div>
-        </div>
-
-        <div class="w-full max-w-sm mt-6 text-center text-sm">
-          <p class="text-zinc-400">
-            Belum punya akun?
-            <span class="text-blue-500 cursor-pointer"><a href="/register">Daftar</a></span>
-          </p>
+        <div class="mt-6 text-center text-sm text-gray-500">
+          Belum punya akun?
+          <router-link to="/register" class="text-blue-500 hover:underline">Daftar</router-link>
         </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -72,14 +66,14 @@ const errorMsg = ref('')
 async function login() {
     errorMsg.value = ''
     errors.value = {}
-
+  
     const result = await auth.login(email.value, password.value)
-   
-    if (result.status) {
-        router.push('/feed')
+    
+    if (result.status != 200) {
+        errorMsg.value = result.response?.data?.message
+        errors.value = result.response?.data?.errors || {}
     } else {
-        errorMsg.value = result.response.data.message
-        errors.value = result.response.data.errors || {}
+       router.push('/feed')
     }
 }
 </script>

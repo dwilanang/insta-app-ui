@@ -2,7 +2,7 @@
   <nav class="bg-white text-zinc-900 border-b border-zinc-200 px-6 py-3 flex justify-between items-center shadow-sm">
     <!-- Logo -->
     <RouterLink to="/feed" class="text-2xl font-bold tracking-tight text-zinc-900 hover:text-blue-600">
-      InstaApp
+      <img src="/logo.png" alt="Logo" class="h-8 w-auto" />
     </RouterLink>
 
     <!-- Menu -->

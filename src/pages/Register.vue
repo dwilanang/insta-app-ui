@@ -1,6 +1,10 @@
 <template>
   <div class="flex min-h-screen items-center justify-center bg-gray-50">
     <div class="w-full max-w-md bg-white p-8 rounded shadow">
+      <!-- Logo dan Judul -->
+      <div class="text-center mb-6">
+        <img src="/logo.png" alt="Logo" class="w-20 mx-auto mb-2" />
+      </div>
       <h2 class="text-2xl font-bold mb-6 text-center">Daftar Akun</h2>
       <form @submit.prevent="register">
         <div class="mb-4">
