@@ -9,7 +9,12 @@
         alt="Avatar"
         class="w-24 h-24 rounded-full object-cover mx-auto mb-2 border"
       />
-      <input type="file" @change="onFileChange" accept="image/*" class="block w-full text-sm text-zinc-600 mt-2" />
+      <input
+            type="file"
+            accept="image/*"
+            @change="onFileChange"
+            class="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
     </div>
 
     <!-- Form -->

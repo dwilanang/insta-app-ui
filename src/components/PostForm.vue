@@ -22,9 +22,7 @@
           <img :src="preview" class="max-h-64 object-contain rounded border mb-2" />
         </div>
 
-        <!-- Upload and Submit in Row -->
-        <div class="flex justify-between items-center gap-4">
-          <!-- File upload -->
+        <div class="mt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <input
             type="file"
             accept="image/*"
@@ -41,6 +39,7 @@
             {{ loading ? 'Posting...' : 'Post' }}
           </button>
         </div>
+       
       </div>
     </transition>
   </form>
